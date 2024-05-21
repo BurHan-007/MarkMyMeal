@@ -1,3 +1,13 @@
+<?php
+	// Initialize session
+	session_start();
+
+	if (!isset($_SESSION['loggedin']) && $_SESSION['loggedin'] !== false) {
+		header('location: login.php');
+		exit;
+	}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,13 +60,13 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">Manas Auti</span>
+            <img src="assets/img/1.png" alt="Profile" class="rounded-circle">
+            <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $_SESSION['username']; ?></span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Manas Auti</h6>
+              <h6><?php echo $_SESSION['username']; ?></h6>
               <span>Computer Science & Engg.</span>
             </li>
             <li>
@@ -64,7 +74,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="profile.html">
+              <a class="dropdown-item d-flex align-items-center" href="profile.php">
                 <i class="bi bi-person"></i>
                 <span>My Profile</span>
               </a>
@@ -74,7 +84,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+              <a class="dropdown-item d-flex align-items-center" href="pages-faq.php">
                 <i class="bi bi-question-circle"></i>
                 <span>Need Help?</span>
               </a>
@@ -84,7 +94,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="login.html">
+              <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -101,7 +111,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link " href="index.html">
+        <a class="nav-link " href="index.php">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -110,28 +120,28 @@
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="profile.html">
+        <a class="nav-link collapsed" href="profile.php">
           <i class="bi bi-person"></i>
           <span>Profile</span>
         </a>
       </li><!-- End Profile Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="error404.html">
+        <a class="nav-link collapsed" href="error404.php">
           <i class="bi bi-question-circle"></i>
           <span>F.A.Q</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="error404.html">
+        <a class="nav-link collapsed" href="pages-contact.php">
           <i class="bi bi-envelope"></i>
           <span>Contact</span>
         </a>
       </li><!-- End Contact Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="feedback.html">
+        <a class="nav-link collapsed" href="feedback.php">
           <i class="bi bi-file-earmark"></i>
           <span>Feedback</span>
         </a>
@@ -147,7 +157,7 @@
       <h1>Dashboard</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item"><a href="index.php">Home</a></li>
           <li class="breadcrumb-item active">Dashboard</li>
         </ol>
       </nav>
@@ -161,7 +171,7 @@
           <div class="row">
 
             <div class="col-xxl-4 col-md-6">
-              <div class="card info-card sales-card">
+              <div class="card info-card">
 
                 <div class="card-body">
                   <h5 class="card-title">M.A.N.E.T Mess</h5>
@@ -181,7 +191,7 @@
             </div>
 
             <div class="col-xxl-4 col-md-6">
-              <div class="card info-card revenue-card">
+              <div class="card info-card">
 
                 <div class="card-body">
                   <h5 class="card-title">Raj Mess</h5>
@@ -202,7 +212,7 @@
 
             <div class="col-xxl-4 col-xl-12">
 
-              <div class="card info-card customers-card">
+              <div class="card info-card">
                 <div class="card-body">
                   <h5 class="card-title">Sangeet Mess</h5>
 
@@ -268,6 +278,54 @@
             </div>
           </div><!-- End Check In -->
 
+          <!-- Mark Leave-->
+
+          <div class="col-12">
+            <div class="card">
+
+              <div class="card-body">
+                <h5 class="card-title"><span>Dashboard / </span>Mark Leave</h5>
+
+                <div class="form-center">
+                  <form class="row g-3">
+
+                    <div class="col-12">
+                      <label class="col-sm-2 col-form-label">Select Time</label>
+                      <div class="col-sm-12">
+                        <select class="form-select" aria-label="Default select example">
+                          <option selected>Open this to select time</option>
+                          <option value="1">Breakfast</option>
+                          <option value="2">Lunch</option>
+                          <option value="3">Dinner</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="col-sm-8 col-form-label">Select Date From?</label>
+                      <div class="col-sm-12">
+                        <input type="date" class="form-control">
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="col-sm-8 col-form-label">Select Date To?</label>
+                      <div class="col-sm-12">
+                        <input type="date" class="form-control">
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <button class="btn btn-primary w-100" type="submit">Submit</button>
+                    </div>
+
+                  </form>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div><!--End Mark Leave-->
         </div>
       </div>
       </div>

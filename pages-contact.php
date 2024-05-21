@@ -1,3 +1,28 @@
+<?php
+	// Initialize session
+	session_start();
+
+	if (!isset($_SESSION['loggedin']) && $_SESSION['loggedin'] !== false) {
+		header('location: login.php');
+		exit;
+	}
+
+    // Include config file
+    require_once "config/config.php";
+
+    $username = array_key_exists('username', $_POST) ? $_POST['username'] : null;
+    $e_mail = array_key_exists('youremail', $_POST) ? $_POST['youremail'] : null;
+    $phoneNum = isset($_POST['phoneNum']) ? $_POST['phoneNum'] : '';
+    $Fmessage = isset($_POST['Fmessage']) ? $_POST['Fmessage'] : '';
+
+    if ($username && $e_mail && $phoneNum && $Fmessage) {
+
+        $stmt = $mysql_db->prepare("INSERT INTO contact(username,email,phoneNum,Fmessage) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $username, $e_mail, $phoneNum, $Fmessage);
+        $stmt->execute();
+        }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,13 +73,13 @@
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-                        <span class="d-none d-md-block dropdown-toggle ps-2">Manas Auti</span>
+                        <img src="assets/img/1.png" alt="Profile" class="rounded-circle">
+                        <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $_SESSION['username']; ?></span>
                     </a><!-- End Profile Iamge Icon -->
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
-                            <h6>Manas Auti</h6>
+                            <h6><?php echo $_SESSION['username']; ?></h6>
                             <span>Computer Science & Engg.</span>
                         </li>
                         <li>
@@ -62,7 +87,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="profile.html">
+                            <a class="dropdown-item d-flex align-items-center" href="profile.php">
                                 <i class="bi bi-person"></i>
                                 <span>My Profile</span>
                             </a>
@@ -72,7 +97,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.php">
                                 <i class="bi bi-question-circle"></i>
                                 <span>Need Help?</span>
                             </a>
@@ -82,7 +107,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="login.html">
+                            <a class="dropdown-item d-flex align-items-center" href="logout.php">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Sign Out</span>
                             </a>
@@ -99,7 +124,7 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="index.html">
+                <a class="nav-link collapsed" href="index.php">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
@@ -108,28 +133,28 @@
             <li class="nav-heading">Pages</li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="profile.html">
+                <a class="nav-link collapsed" href="profile.php">
                     <i class="bi bi-person"></i>
                     <span>Profile</span>
                 </a>
             </li><!-- End Profile Page Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="error404.html">
+                <a class="nav-link collapsed" href="error404.php">
                     <i class="bi bi-question-circle"></i>
                     <span>F.A.Q</span>
                 </a>
             </li><!-- End F.A.Q Page Nav -->
 
             <li class="nav-item">
-                <a class="nav-link" href="pages-contact.html">
+                <a class="nav-link" href="pages-contact.php">
                     <i class="bi bi-envelope"></i>
                     <span>Contact</span>
                 </a>
             </li><!-- End Contact Page Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="feedback.html">
+                <a class="nav-link collapsed" href="feedback.php">
                     <i class="bi bi-file-earmark"></i>
                     <span>Feedback</span>
                 </a>
@@ -145,7 +170,7 @@
             <h1>Contact</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                     <li class="breadcrumb-item">Pages</li>
                     <li class="breadcrumb-item active">Contact</li>
                 </ol>
@@ -162,33 +187,33 @@
 
                             <div class="form-left">
 
-                                <form class="row g-3">
+                                <form class="row g-3" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
                                     <div class="col-10">
 
                                         <label class="col-sm-2 col-form-label">Name</label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control">
+                                            <input type="text" class="form-control" id='username' name='username'>
                                         </div>
                                     </div>
 
                                     <div class="col-10">
                                         <label class="col-sm-2 col-form-label">Email Address</label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control">
+                                            <input type="text" class="form-control" id='youremail' name='youremail'>
                                         </div>
                                     </div>
 
                                     <div class="col-10">
                                         <label class="col-sm-8 col-form-label">Phone Number</label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control">
+                                            <input type="text" class="form-control" id='phoneNum' name='phoneNum'>
                                         </div>
                                     </div>
 
                                     <div class="col-10">
                                         <label class="col-sm-8 col-form-label">Message</label>
                                         <div class="col-sm-12">
-                                            <textarea class="form-control" style="height: 100px"></textarea>
+                                            <textarea class="form-control" style="height: 100px" id='Fmessage' name='Fmessage'></textarea>
                                         </div>
                                     </div>
 

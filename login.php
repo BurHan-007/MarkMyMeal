@@ -1,3 +1,95 @@
+<?php
+  // Initialize sessions
+  session_start();
+
+  // Check if the user is already logged in, if yes then redirect him to welcome page
+  if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+    header("location: index.php");
+    exit;
+  }
+
+  // Include config file
+  require_once "config/config.php";
+
+  // Define variables and initialize with empty values
+  $username = $password = '';
+  $username_err = $password_err = '';
+
+  // Process submitted form data
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Check if username is empty
+    if(empty(trim($_POST['username']))){
+      $username_err = 'Please enter username.';
+    } else{
+      $username = trim($_POST['username']);
+    }
+
+    // Check if password is empty
+    if(empty(trim($_POST['password']))){
+      $password_err = 'Please enter your password.';
+    } else{
+      $password = trim($_POST['password']);
+    }
+
+    // Validate credentials
+    if (empty($username_err) && empty($password_err)) {
+      // Prepare a select statement
+      $sql = 'SELECT id, email, password FROM users WHERE email = ?';
+
+      if ($stmt = $mysql_db->prepare($sql)) {
+
+        // Set parmater
+        $param_username = $username;
+
+        // Bind param to statement
+        $stmt->bind_param('s', $param_username);
+
+        // Attempt to execute
+        if ($stmt->execute()) {
+
+          // Store result
+          $stmt->store_result();
+
+          // Check if username exists. Verify user exists then verify
+          if ($stmt->num_rows == 1) {
+            // Bind result into variables
+            $stmt->bind_result($id, $username, $hashed_password);
+
+            if ($stmt->fetch()) {
+              if (password_verify($password, $hashed_password)) {
+
+                // Start a new session
+                session_start();
+
+                // Store data in sessions
+                $_SESSION['loggedin'] = true;
+                $_SESSION['id'] = $id;
+                $_SESSION['username'] = $username;
+
+                // Redirect to user to page
+                header('location: index.php');
+              } else {
+                // Display an error for passord mismatch
+                $password_err = 'Invalid password';
+              }
+            }
+          } else {
+            $username_err = "Username does not exists.";
+          }
+        } else {
+          echo "Oops! Something went wrong please try again";
+        }
+        // Close statement
+        $stmt->close();
+      }
+
+      // Close connection
+      $mysql_db->close();
+    }
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,21 +147,22 @@
                     <p class="text-center small">Enter your username & password to login</p>
                   </div>
 
-                  <form action="index.html" class="row g-3 needs-validation" novalidate>
+                  <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="row g-3"  method="POST" novalidate>
 
                     <div class="col-12">
                       <label for="yourUsername" class="form-label">Username</label>
-                      <div class="input-group has-validation">
+                      <div class="input-group <?php (!empty($username_err))?'has_error':'';?>">
                         <span class="input-group-text" id="inputGroupPrepend">@</span>
-                        <input type="text" name="username" class="form-control" id="yourUsername" required>
-                        <div class="invalid-feedback">Please enter your username.</div>
+                        <input type="text" name="username" id="username" class="form-control" value="<?php echo $username ?>" required>
+                        <p class="invalid-feedback"><?php echo $username_err;?></p>
                       </div>
                     </div>
 
-                    <div class="col-12">
+                    <div class="col-12 <?php (!empty($password_err))?'has_error':'';?>">
                       <label for="yourPassword" class="form-label">Password</label>
-                      <input type="password" name="password" class="form-control" id="yourPassword" required>
-                      <div class="invalid-feedback">Please enter your password!</div>
+                      <input type="password" name="password" id="password" class="form-control" value="<?php echo $password ?>" required>
+                      <div class="help-block"><?php echo $password_err;?></div>
+                      <div class="invalid-feedback">Please enter your password.</div>
                     </div>
 
                     <div class="col-12">
@@ -82,7 +175,7 @@
                       <button class="btn btn-primary w-100" type="submit">Login</button>
                     </div>
                     <div class="col-12">
-                      <p class="small mb-0">Don't have account? <a href="pages-register.html">Create an account</a></p>
+                      <p class="small mb-0">Don't have account? <a href="pages-register.php">Create an account</a></p>
                     </div>
                   </form>
                 </div>
@@ -110,5 +203,4 @@
   <script src="assets/js/main.js"></script>
 
 </body>
-
 </html>
